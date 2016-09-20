@@ -20,15 +20,12 @@ disk_load:
 	pop dx
 	cmp dh, al ; dh is sectors expected, al is sectors actually read
 	jne disk_error
-	mov bx, MSG_NO_ERROR
-	call print_string
 	ret
 
 disk_error:
-	mov bx, MSG_ERROR
-	call print_string
+	mov ah, 0xe
+	mov al, '!'
+	int 0x10
 	jmp $
 
-	MSG_ERROR db 'Reading from disk has failed', 0
-	MSG_NO_ERROR db 'Reading from disk succeeded', 0
 

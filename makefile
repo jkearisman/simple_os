@@ -3,7 +3,7 @@ OBJS = $(C_SOURCES:.c=.o)
 all: os-image
 
 run: os-image
-	qemu-system-i386 -fda os-image
+	qemu-system-x86_64 -fda os-image
 
 os-image: boot.bin kernel.bin
 	cat $^ > os-image
@@ -18,9 +18,10 @@ kernel_entry.o: kernel/kernel_entry.asm
 	nasm $^ -f elf -o $@
 
 %.o: %.c
-	gdc -g -m32 -ffreestanding -c $^ -o $@
+	gcc -m32 -ffreestanding -c $^ -o $@
 
 clean:
 	rm *.bin
-	rm ${OBJS}
+	rm *.o
 	rm os-image 
+	rm kernel/*.o

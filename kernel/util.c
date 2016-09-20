@@ -1,16 +1,16 @@
 #include "util.h"
 
-void* memset(void* dest, char c, int bytes_to_set) {
+void* memset(void* dest, char c, int bytes_to_set) 
+{
 	int i;
 	for(i = 0; i < bytes_to_set; i++) {
 		((char*)dest)[i] = c;
 	}
 	return dest;
-
-
-
 }
-void print(char* message, int length, int row) {
+
+void print(char* message, int length, int row) 
+{
 	if(length < 0) {
 		return;
 	}
@@ -31,17 +31,29 @@ void print(char* message, int length, int row) {
 	return;
 }
 
+void pr_int(unsigned to_print, int row) {
+	char message[8];
+	memset(message, 0, 8);
+	int place = 7;
+	char* video_memory = (char*)0xb8000;
+	char white_on_black = (char)0x7;
+	unsigned div_by = 0x10000000;
 
-
-struct IDTDescr keyboard_idt;
-
-int loadIDT() {
-	keyboard_idt.offset_1 = 0;
-	keyboard_idt.selector = 0;
-	keyboard_idt.zero = 0;
-	keyboard_idt.type_attr = 0;
-	keyboard_idt.offset_2 = 0;
-
-	asm("lidt (%0)":"=r"(keyboard_idt):);
-	print("Loaded idt", 10, 1);
+	while(div_by > 0 ) {
+		int this_place = to_print / div_by;
+		if(this_place >= 0 && this_place <= 9) {
+			*(video_memory++) = (char)(0x30 + this_place);
+		} else if(this_place >= 0xa && this_place <= 0xf) {
+			*(video_memory++) = (char)(0x61 + this_place - 0xa);
+		} else {
+			*(video_memory++) = '!';
+		}
+		*(video_memory++) = white_on_black;
+		to_print %= div_by;
+		div_by /= 0x10;
+	}
 }
+
+
+
+
